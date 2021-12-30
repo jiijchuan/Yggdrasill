@@ -1,9 +1,10 @@
 #pragma once
 
-#ifdef __windows__
+#ifdef _WIN64
 #include <Windows.h>
 #include <conio.h>
 #endif
+
 #ifdef __linux__
 #include <unistd.h>
 #endif

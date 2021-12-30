@@ -41,7 +41,7 @@ void Interface::flush() {
 }
 
 void Interface::cover_ch(char ch, uint16_t x, uint16_t y) {
-#ifdef __windows__
+#ifdef _WIN64
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (SHORT)x, (SHORT)y });
 	putchar(ch);
 #endif
@@ -109,7 +109,7 @@ void StageGame::game_show(Stage& s) {
 		}
 		check_grown();
 		post_changes();
-#ifdef __windows__
+#ifdef _WIN64
 		Sleep(500 / _global.speed_val());
 #endif
 #ifdef __linux__
@@ -291,7 +291,7 @@ void StageSettings::main(Stage& s) {
 	load_basic_assets();
 	while (keyboard_.get_keyboard_running()) {
 		// TODO:: need to be fully rewrite
-#ifdef __windows__
+#ifdef _WIN64
 		if (_kbhit()) {
 			auto key = _getch();
 			auto k = keyboard_.get_key(key);

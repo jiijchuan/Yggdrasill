@@ -10,7 +10,7 @@ public:
 		_game(res),
 		_settings(res)
 	{
-#ifdef __windows__
+#ifdef _WIN64
 		// hide cursor
 		HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_CURSOR_INFO CursorInfo;
@@ -59,7 +59,7 @@ void App::main() {
 			_running = false;
 			break;
 		default:
-#ifdef __windows__
+#ifdef _WIN64
 			throw std::exception("invalid stage variable!");
 #endif
 #ifdef __linux__

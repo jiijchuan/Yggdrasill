@@ -193,7 +193,7 @@ void Keyboard::main(keyboard_callback callback) {
 	while (_keyboard_running) {
 		while (_current_event == Event::KEY_ESC) _keyboard_cv.wait(key_lock);
 		// TODO: complete rewrite
-#ifdef __windows__
+#ifdef _WIN64
 		if (_kbhit()) {
 			auto key = _getch();
 			if (!_keyboard_running) break;
@@ -212,10 +212,10 @@ void Keyboard::set_hotkey(hotkey_ptr hotkey) {
 void Keyboard::main() {
 	while (_keyboard_running) {
 		// TODO: complete rewrite
-#ifdef __windows__
+#ifdef _WIN64
 		if (_kbhit()) {
 			auto key = _getch();
-			_current_key = get_key(key));
+			_current_key = get_key(key);
 			Keyboard::kbcv.notify_all();
 		}
 #endif
@@ -227,7 +227,7 @@ inline key Keyboard::get_key(int k) {
 	if (isascii(k)) return key(KeyType::ASCII, k);
 	else {
 		// TODO: complete rewrite
-#ifdef __windows__
+#ifdef _WIN64
 		auto ch = _getch();
 		return key(KeyType::NONE_ASCII, ch);
 #endif
