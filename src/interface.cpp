@@ -207,11 +207,10 @@ void StageGame::show_pause_window(Stage& s) {
 	flush();
 
 	auto pause_window_running = true;
-	while (pause_window_running) {
-		std::unique_lock<std::mutex> pause_window_lock(Keyboard::kbmtx);
-		while (!Keyboard::on_hit) Keyboard::kbcv.wait(pause_window_lock);
-
-	}
+	// while (pause_window_running) {
+	// 	std::unique_lock<std::mutex> pause_window_lock(Keyboard::kbmtx);
+	// 	while (!Keyboard::on_hit) Keyboard::kbcv.wait(pause_window_lock);
+	// }
 
 	Keyboard window_kbd(HotKeys(_map.resolution()));
 	window_kbd.main([&](Event key) {

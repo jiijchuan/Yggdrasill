@@ -120,7 +120,7 @@ public:
 		_keyboard_running(true),
 		_hotkey(),
 		_current_key(key(KeyType::ASCII, 0))
-	{ Keyboard::on_hit.store(false); }
+	{}
 
 	Keyboard(HotKeys hotkey) :
 		_current_event(Event::NONE_EVENT),
@@ -129,7 +129,7 @@ public:
 		_keyboard_cv(),
 		_hotkey(hotkey),
 		_current_key(key(KeyType::ASCII, 0))
-	{ Keyboard::on_hit.store(false); }
+	{}
 
 	//~Keyboard() { std::cout << "keyboard deconstructed"; Sleep(1000); };
 	void set_hotkey(hotkey_ptr hotkey);
@@ -167,3 +167,5 @@ private:
 	key _current_key;
 	std::atomic<bool> _keyboard_running;
 };
+
+std::atomic<bool> Keyboard::on_hit(false);
