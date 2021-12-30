@@ -1,7 +1,6 @@
 ﻿// snake.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 #include "interface.h"
-#include "snake.h"
 #include "settings.h"
 
 
@@ -15,12 +14,14 @@ public:
 		_game(res),
 		_settings(res)
 	{
+#ifdef __windows__
 		// hide cursor
 		HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_CURSOR_INFO CursorInfo;
 		GetConsoleCursorInfo(handle, &CursorInfo);
 		CursorInfo.bVisible = false;
 		SetConsoleCursorInfo(handle, &CursorInfo);
+#endif
 	};
 
 	void main();
@@ -62,7 +63,12 @@ void App::main() {
 			_running = false;
 			break;
 		default:
+#ifdef __windows__
 			throw std::exception("invalid stage variable!");
+#endif
+#ifdef __linux__
+			throw std::exception();
+#endif
 			break;
 		}
 		_stage.store(stage);

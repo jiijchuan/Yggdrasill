@@ -1,9 +1,16 @@
 #pragma once
-#include <vector>
+
+#ifdef __windows__
+#include <Windows.h>
 #include <conio.h>
+#endif
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
+#include <vector>
 #include <iostream>
 #include <assert.h>
-#include <Windows.h>
 #include <atomic>
 #include <thread>
 #include <functional>
@@ -12,7 +19,6 @@
 #include <string>
 #include <mutex>
 #include <condition_variable>
-#include <Windows.h>
 #include <atomic>
 #include <thread>
 

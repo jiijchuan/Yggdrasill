@@ -1,5 +1,10 @@
 #include "base.h"
 
+#ifdef __linux__
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
 component::component() : 
 	_mat({ {} }), _x(0), _y(0), _empty(true) 
 {};

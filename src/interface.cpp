@@ -1,4 +1,5 @@
 #include "interface.h"
+#include "settings.h"
 
 void Interface::cast_change(component c) {
 	flush_list_.push_back(c);
@@ -40,8 +41,10 @@ void Interface::flush() {
 }
 
 void Interface::cover_ch(char ch, uint16_t x, uint16_t y) {
+#ifdef __windows__
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (SHORT)x, (SHORT)y });
 	putchar(ch);
+#endif
 }
 
 void StageMenu::main(Stage& s) {
@@ -106,7 +109,12 @@ void StageGame::game_show(Stage& s) {
 		}
 		check_grown();
 		post_changes();
+#ifdef __windows__
 		Sleep(500 / _global.speed_val());
+#endif
+#ifdef __linux__
+		usleep(500 / _global.speed_val());
+#endif
 	}
 }
 
@@ -283,6 +291,8 @@ void StageGame::show_go_window(Stage& s) {
 void StageSettings::main(Stage& s) {
 	load_basic_assets();
 	while (keyboard_.get_keyboard_running()) {
+		// TODO:: need to be fully rewrite
+#ifdef __windows__
 		if (_kbhit()) {
 			auto key = _getch();
 			auto k = keyboard_.get_key(key);
@@ -308,6 +318,7 @@ void StageSettings::main(Stage& s) {
 				flush();
 			}
 		}
+#endif
 	}
 }
 

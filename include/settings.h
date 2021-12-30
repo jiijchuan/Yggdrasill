@@ -118,16 +118,18 @@ public:
 	Keyboard() :
 		_current_event(Event::NONE_EVENT),
 		_keyboard_running(true),
-		_hotkey()
-	{}
+		_hotkey(),
+		_current_key(key(KeyType::ASCII, 0))
+	{ Keyboard::on_hit.store(false); }
 
 	Keyboard(HotKeys hotkey) :
 		_current_event(Event::NONE_EVENT),
 		_keyboard_running(true),
 		_keyboard_mtx(),
 		_keyboard_cv(),
-		_hotkey(hotkey)
-	{};
+		_hotkey(hotkey),
+		_current_key(key(KeyType::ASCII, 0))
+	{ Keyboard::on_hit.store(false); }
 
 	//~Keyboard() { std::cout << "keyboard deconstructed"; Sleep(1000); };
 	void set_hotkey(hotkey_ptr hotkey);
@@ -148,7 +150,7 @@ public:
 	// ver. 2
 public:
 	void main();
-	key current_key() { return _current_key.load(); }
+	key current_key() { return _current_key; }
 
 	static std::condition_variable kbcv;
 	static std::mutex kbmtx;
@@ -162,8 +164,6 @@ private:
 
 	//ver. 2
 private:
-	std::atomic<key> _current_key;
+	key _current_key;
 	std::atomic<bool> _keyboard_running;
 };
-
-std::atomic<bool> Keyboard::on_hit = false;

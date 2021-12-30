@@ -129,7 +129,11 @@ bool SnakeControl::heading_backhead() {
 	else if (backhead.x() == head_.x() && (backhead.y() == head_.y() - 1)) return status_ == SnakeStatus::HEADING_UP;
 	else if ((backhead.x() == head_.x() + 1) && backhead.y() == head_.y()) return status_ == SnakeStatus::HEADING_RIGHT;
 	else if ((backhead.x() == head_.x() - 1) && backhead.y() == head_.y()) return status_ == SnakeStatus::HEADING_LEFT;
+#ifdef __windows__
 	else throw std::exception("incorrect head-body direction!");
+#else
+	else throw std::exception();
+#endif
 }
 
 void SnakeControl::dir_reverse() {
@@ -234,7 +238,11 @@ Stage MainMenu::to_stage() {
 	else if (option == "Restart") {	return Stage::SNAKE_RESTART; }
 	else if (option == "Settings") return Stage::SNAKE_SETTINGS;
 	else if (option == "Exit") return Stage::SNAKE_END;
+#ifdef __windows__
 	else throw std::exception("wrong option name!");
+#else
+	else return Stage::NONE_STAGE;
+#endif
 }
 
 
@@ -317,6 +325,8 @@ Stage GameOverWindow::on_event(Event e) {
 		return Stage::NONE_STAGE;
 	case Event::KEY_ENTER:
 		return on_option();
+	default:
+		return Stage::NONE_STAGE;
 	}
 }
 
@@ -356,7 +366,11 @@ snake_vec SettingControl::current_page() {
 	case SettingPage::PAGE_GLOBAL:
 		return _global.menu();
 	default:
+#ifdef __windows__
 		throw std::exception("wrong page value!");
+#else
+		throw std::exception();
+#endif
 	}
 }
 
@@ -392,7 +406,12 @@ void SettingControl::on_menu(Event e) {
 			load_menu(_global.options());
 			update_casted(_arrow);
 		}
+#ifdef __windows__
 		else throw std::exception("wrong arrow at value!");
+#endif
+#ifdef __linux__
+		else throw std::exception();
+#endif
 		break;
 	case Event::KEY_LEFT:
 		if (_page_showing == SettingPage::PAGE_GLOBAL) { 

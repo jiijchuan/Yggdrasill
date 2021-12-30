@@ -192,6 +192,8 @@ void Keyboard::main(keyboard_callback callback) {
 	std::unique_lock<std::mutex> key_lock(_keyboard_mtx);
 	while (_keyboard_running) {
 		while (_current_event == Event::KEY_ESC) _keyboard_cv.wait(key_lock);
+		// TODO: complete rewrite
+#ifdef __windows__
 		if (_kbhit()) {
 			auto key = _getch();
 			if (!_keyboard_running) break;
@@ -199,6 +201,7 @@ void Keyboard::main(keyboard_callback callback) {
 			else _current_event.store(_hotkey.k2evt(get_key(key)));
 			callback(_current_event.load());
 		}
+#endif
 	}
 }
 
@@ -208,11 +211,14 @@ void Keyboard::set_hotkey(hotkey_ptr hotkey) {
 
 void Keyboard::main() {
 	while (_keyboard_running) {
+		// TODO: complete rewrite
+#ifdef __windows__
 		if (_kbhit()) {
 			auto key = _getch();
-			_current_key.store(get_key(key));
+			_current_key = get_key(key));
 			Keyboard::kbcv.notify_all();
 		}
+#endif
 	}
 }
 
@@ -220,8 +226,11 @@ inline key Keyboard::get_key(int k) {
 	// case each button
 	if (isascii(k)) return key(KeyType::ASCII, k);
 	else {
+		// TODO: complete rewrite
+#ifdef __windows__
 		auto ch = _getch();
 		return key(KeyType::NONE_ASCII, ch);
+#endif
 	}
 }
 
