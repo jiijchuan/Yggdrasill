@@ -190,34 +190,15 @@ void Global::add_marker(uint16_t x, uint16_t y) {
 std::condition_variable Keyboard::kbcv;
 std::mutex Keyboard::kbmtx;
 std::atomic<bool> Keyboard::on_hit(false);
-
-void Keyboard::main(keyboard_callback callback) {
-	std::unique_lock<std::mutex> key_lock(_keyboard_mtx);
-	while (_keyboard_running) {
-		while (_current_event == Event::KEY_ESC) _keyboard_cv.wait(key_lock);
-		// TODO: complete rewrite
-#ifdef _WIN64
-		if (_kbhit()) {
-			auto key = _getch();
-			if (!_keyboard_running) break;
-			if (_current_event == Event::KEY_ESC) continue;
-			else _current_event.store(_hotkey.k2evt(get_key(key)));
-			callback(_current_event.load());
-		}
-#endif
-	}
-}
-
-void Keyboard::set_hotkey(hotkey_ptr hotkey) {
-	_hotkey.set() = hotkey->set();
-}
+std::atomic<key> Keyboard::current_key(key(KeyType::ASCII, 0));
 
 void Keyboard::main() {
 #ifdef _WIN64
 	while (_keyboard_running) {
 		if (_kbhit()) {
 			auto key = _getch();
-			_current_key = get_key(key);
+			Keyboard::current_key.store(get_key(key));
+			Keyboard::on_hit.store(true);
 			Keyboard::kbcv.notify_all();
 		}
 	}

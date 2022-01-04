@@ -116,54 +116,19 @@ typedef std::function<void(Event)> keyboard_callback;
 class Keyboard {
 public:
 	Keyboard() :
-		_current_event(Event::NONE_EVENT),
-		_keyboard_running(true),
-		_hotkey(),
-		_current_key(key(KeyType::ASCII, 0))
+		_keyboard_running(true)
 	{}
 
-	Keyboard(HotKeys hotkey) :
-		_current_event(Event::NONE_EVENT),
-		_keyboard_running(true),
-		_keyboard_mtx(),
-		_keyboard_cv(),
-		_hotkey(hotkey),
-		_current_key(key(KeyType::ASCII, 0))
-	{}
-
-	//~Keyboard() { std::cout << "keyboard deconstructed"; Sleep(1000); };
-	void set_hotkey(hotkey_ptr hotkey);
-	void set_current_event(Event key) { _current_event.store(key); };
-	Event current_event() { return _current_event.load(); };
-
-	void set_keyboard_running(bool run) { _keyboard_running = run; };
-	bool get_keyboard_running() { return _keyboard_running; };
-
-	key get_key(int k);
-	HotKeys& hotkey() { return _hotkey; }
-
-	//void suspend_keyboard() { key_suspend_.store(true); };
-	void resume_keyboard() { _keyboard_cv.notify_one(); };
-
-	void main(keyboard_callback callback);
-
-	// ver. 2
-public:
 	void main();
-	key current_key() { return _current_key; }
 
 	static std::condition_variable kbcv;
 	static std::mutex kbmtx;
 	static std::atomic<bool> on_hit;
+	static std::atomic<key> current_key;
 
 private:
-	HotKeys _hotkey;
-	std::atomic<Event> _current_event;
-	std::mutex _keyboard_mtx;
-	std::condition_variable _keyboard_cv;
+	key get_key(int k);
 
-	//ver. 2
 private:
-	key _current_key;
 	std::atomic<bool> _keyboard_running;
 };

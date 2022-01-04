@@ -6,7 +6,8 @@ public:
 	App(uint16_t res) : 
 		_stage(Stage::SNAKE_MENU), 
 		_running(true), 
-		_menu(res), 
+		_mainkb(),
+		_menu(res),
 		_game(res),
 		_settings(res)
 	{
@@ -23,15 +24,25 @@ public:
 	void main();
 
 private:
+	void game();
+
+private:
 	std::atomic<Stage> _stage;
 	std::atomic<bool> _running;
 	StageMenu _menu;
 	StageGame _game;
 	StageSettings _settings;
-	Keyboard _mainkbd;
+	Keyboard _mainkb;
 };
 
 void App::main() {
+	std::thread game([&]() { game(); });
+	std::thread kb([&]() { _mainkb.main(); });
+	game.join();
+	kb.join();
+}
+
+void App::game() {
 	auto previous_stage = Stage::SNAKE_MENU;
 	while (_running) {
 		auto stage = _stage.load();
@@ -70,6 +81,7 @@ void App::main() {
 		_stage.store(stage);
 	}
 }
+
 
 
 int main()

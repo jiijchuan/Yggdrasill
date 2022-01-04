@@ -158,8 +158,8 @@ void SnakeControl::dir_reverse() {
 
 bool SnakeControl::touches(component& c) {
 	auto& head = _components[0];
-	int c_w = c.mat()[0].size();
-	int c_h = c.mat().size();
+	int c_w = (int)c.mat()[0].size();
+	int c_h = (int)c.mat().size();
 
 	auto y_short = head.y() - c.y();
 	auto x_short = head.x() - c.x();
@@ -226,7 +226,7 @@ void MainMenu::init() {
 
 	for (size_t i = 1; i < _components.size(); i++) {
 		_components[i].x() = _menu_left_align;
-		_components[i].y() = _menu_start_height + i - 1;
+		_components[i].y() = _menu_start_height + (uint16_t)i - 1;
 	}
 	load_menu(snake_vec(_components.begin() + 1, _components.end()));
 }

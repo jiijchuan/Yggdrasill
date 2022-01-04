@@ -4,22 +4,13 @@
 #include "game.h"
 
 
-
 class Interface {
 public:
-	Interface(HotKeys hotkey) : 
-		_flush_list({}),
-		_running(true),
-		_keyboard(hotkey)
-	{};
-
-	Interface() :
-		_flush_list({}),
-		_running(true),
-		_keyboard()
-	{};
+	Interface() {};
 
 	void clear_all(uint16_t res);
+
+	void set_hotkey(hotkey_ptr hotkey) { _hotkey = *hotkey.get(); }
 
 protected:
 	// set everything in flush list to console and then empty flush list
@@ -34,14 +25,13 @@ protected:
 
 protected:
 	HotKeys _hotkey;
-	Keyboard _keyboard;
 	std::vector<component> _flush_list;
 	std::atomic<bool> _running;
 };
 
 class StageMenu : public Interface {
 public:
-	StageMenu(uint16_t res) : Interface(HotKeys(res)), _menu(res) {};
+	StageMenu(uint16_t res) : Interface(), _menu(res) {};
 	void main(Stage& s);
 	void fresh() { _menu.set_fresh_new(); };
 	void old() { _menu.set_damn_old(); };
@@ -49,6 +39,25 @@ public:
 private:
 	MainMenu _menu;
 };
+
+class StagePause : public Interface {
+public:
+	StagePause(uint16_t res) : _pause(res) {}
+	void main(Stage& s);
+
+private:
+	PauseWindow _pause;
+};
+
+class StageGameOver : public Interface {
+public:
+	StageGameOver(uint16_t res) : _game_over(res){}
+	void main(Stage& s);
+
+private:
+	GameOverWindow _game_over;
+};
+
 
 
 class StageGame: public Interface {
@@ -65,7 +74,6 @@ public:
 
 	void main(Stage& s);
 	void set_global(Global& global) { _global = global; }
-	void set_hotkey(hotkey_ptr hkp) { _keyboard.set_hotkey(hkp); }
 	bool rookie() { return _rookie.load(); };
 	void set_rookie(bool r) { _rookie.store(r); };
 
@@ -74,34 +82,29 @@ private:
 	void game_show(Stage& s);
 	void reset_all_assets();
 	void load_basic_assets();
-	void judge_keys(Stage& s);
 	bool check_died();
 	void check_grown();
 	void post_changes();
 
 private:
-	// windows
-	void show_pause_window(Stage& s);
-	void show_go_window(Stage& s);
+	StageGameOver _game_over;
+	StagePause _pause;
 
-private:
-	void game_keyboard();
-	void end_stage();
-
-private:
 	Global _global;
-	GameOverWindow _game_over;
-	PauseWindow _pause;
 	GameMapControl _map;
 	SnakeControl _snake;
 	std::atomic<bool> _rookie;
+
+// ver.2
+private:
+	void judge_key(Stage& s);
 };
 
 
 class StageSettings : public Interface {
 public:
-	StageSettings(uint16_t res): 
-		Interface(HotKeys()), 
+	StageSettings(uint16_t res):
+		Interface(),
 		_setting_control(res)
 	{};
 
