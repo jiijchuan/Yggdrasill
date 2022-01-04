@@ -167,5 +167,3 @@ private:
 	key _current_key;
 	std::atomic<bool> _keyboard_running;
 };
-
-std::atomic<bool> Keyboard::on_hit(false);

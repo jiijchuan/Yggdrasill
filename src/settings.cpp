@@ -187,6 +187,9 @@ void Global::add_marker(uint16_t x, uint16_t y) {
 	_markers.push_back(str2cpnt(">", x + 5, y));
 }
 
+std::condition_variable Keyboard::kbcv;
+std::mutex Keyboard::kbmtx;
+std::atomic<bool> Keyboard::on_hit(false);
 
 void Keyboard::main(keyboard_callback callback) {
 	std::unique_lock<std::mutex> key_lock(_keyboard_mtx);
