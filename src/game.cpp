@@ -517,9 +517,6 @@ void SettingControl::on_hotkey(Event e) {
 		old_val = _hotkey.value_component(arrow_idx());
 		update_cleared(old_val);
 		_changing_hotkey.store(true);
-		//set_hotkey();
-		//new_val = _hotkey.value_component(arrow_idx());
-		//update_casted(new_val);
 	default:
 		break;
 	}
