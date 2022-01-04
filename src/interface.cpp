@@ -2,11 +2,11 @@
 #include "settings.h"
 
 void Interface::cast_change(component c) {
-	flush_list_.push_back(c);
+	_flush_list.push_back(c);
 }
 
 void Interface::cast_change(std::vector<component> c) {
-	for (auto& i : c) flush_list_.push_back(i);
+	for (auto& i : c) _flush_list.push_back(i);
 }
 
 void Interface::clear_area(component& c) {
@@ -30,14 +30,14 @@ void Interface::clear_all(uint16_t res) {
 }
 
 void Interface::flush() {
-	for (auto& i : flush_list_) {
+	for (auto& i : _flush_list) {
 		for (size_t j = 0; j < i.mat().size(); j++) {
 			for (size_t k = 0; k < i.mat()[0].size(); k++) {
 				if (i.mat()[j][k] != SPACE) cover_ch(i.mat()[j][k], (uint16_t)k + i.x(), (uint16_t)j + i.y());
 			}
 		}
 	}
-	flush_list_.clear();
+	_flush_list.clear();
 }
 
 void Interface::cover_ch(char ch, uint16_t x, uint16_t y) {
@@ -49,14 +49,14 @@ void Interface::cover_ch(char ch, uint16_t x, uint16_t y) {
 
 void StageMenu::main(Stage& s) {
 	_menu.reset_assets();
-	running_.store(true);
+	_running.store(true);
 	clear_all(_menu.resolution());
-	keyboard_.set_keyboard_running(true);
+	_keyboard.set_keyboard_running(true);
 	cast_change(_menu.arrow());
 	cast_change(_menu.components());
 	flush();
 
-	keyboard_.main([&](Event key) {
+	_keyboard.main([&](Event key) {
 		switch (key) {
 		case Event::KEY_UP:
 			clear_area(_menu.arrow());
@@ -69,14 +69,14 @@ void StageMenu::main(Stage& s) {
 		case Event::KEY_ENTER:
 			// check arrow position and set correspond stage factor
 			s = _menu.to_stage();
-			keyboard_.set_keyboard_running(false);
-			running_.store(false);
+			_keyboard.set_keyboard_running(false);
+			_running.store(false);
 			break;
 		default:
 			break;
 		}
-		if ((!running_) || s != Stage::SNAKE_MENU) return;
-		if (keyboard_.get_keyboard_running()) cast_change(_menu.arrow());
+		if ((!_running) || s != Stage::SNAKE_MENU) return;
+		if (_keyboard.get_keyboard_running()) cast_change(_menu.arrow());
 		flush();
 		});
 }
@@ -92,19 +92,19 @@ void StageGame::game_show(Stage& s) {
 	if (rookie()) reset_all_assets();
 	load_basic_assets();
 	set_rookie(false);
-	while (running_) {
+	while (_running) {
 		judge_keys(s);
-		if ((!running_) || 
+		if ((!_running) || 
 			(s != Stage::SNAKE_GAME 
 			&& s != Stage::GAME_CONTINUE 
 			&& s!=Stage::SNAKE_RESTART)) break;
 
 		if (check_died()) { 
 			set_rookie(true);
-			keyboard_.set_current_event(Event::KEY_ESC);
+			_keyboard.set_current_event(Event::KEY_ESC);
 			show_go_window(s); 
-			keyboard_.set_current_event(Event::NONE_EVENT);
-			keyboard_.resume_keyboard();
+			_keyboard.set_current_event(Event::NONE_EVENT);
+			_keyboard.resume_keyboard();
 			return; 
 		}
 		check_grown();
@@ -120,14 +120,14 @@ void StageGame::game_show(Stage& s) {
 
 void StageGame::judge_keys(Stage& s) {
 	auto last_key = Event::NONE_EVENT;
-	auto event = keyboard_.current_event();
+	auto event = _keyboard.current_event();
 	// void judge_keys(Event key, Stage& s)
 	switch (event) {
 	case Event::KEY_ESC:
 	case Event::KEY_PAUSE:
 		show_pause_window(s);
-		keyboard_.set_current_event(last_key);
-		keyboard_.resume_keyboard();
+		_keyboard.set_current_event(last_key);
+		_keyboard.resume_keyboard();
 		break;
 	case Event::KEY_UP:
 		_snake.set_status(SnakeStatus::HEADING_UP);
@@ -183,20 +183,20 @@ void StageGame::reset_all_assets() {
 }
 
 void StageGame::load_basic_assets() {
-	running_.store(true);
-	keyboard_.set_keyboard_running(true);
+	_running.store(true);
+	_keyboard.set_keyboard_running(true);
 	clear_all(_map.resolution());
 	_map.gen_food(_snake, _global);
 	cast_change(_map.fence());
 	cast_change(_snake.components());
 	cast_change(_map.foods());
 	flush();
-	if(rookie()) keyboard_.set_current_event(Event::KEY_RIGHT);
+	if(rookie()) _keyboard.set_current_event(Event::KEY_RIGHT);
 }
 
 void StageGame::game_keyboard() {
-	keyboard_.set_keyboard_running(true);
-	keyboard_.main([this](Event key) {});
+	_keyboard.set_keyboard_running(true);
+	_keyboard.main([this](Event key) {});
 }
 
 void StageGame::show_pause_window(Stage& s) {
@@ -249,8 +249,8 @@ void StageGame::show_pause_window(Stage& s) {
 }
 
 void StageGame::end_stage() {
-	running_.store(false);
-	keyboard_.set_keyboard_running(false);
+	_running.store(false);
+	_keyboard.set_keyboard_running(false);
 }
 
 void StageGame::show_go_window(Stage& s) {
@@ -289,13 +289,13 @@ void StageGame::show_go_window(Stage& s) {
 
 void StageSettings::main(Stage& s) {
 	load_basic_assets();
-	while (keyboard_.get_keyboard_running()) {
+	while (_keyboard.get_keyboard_running()) {
 		// TODO:: need to be fully rewrite
 #ifdef _WIN64
 		if (_kbhit()) {
 			auto key = _getch();
-			auto k = keyboard_.get_key(key);
-			auto e = keyboard_.hotkey().k2evt(k);
+			auto k = _keyboard.get_key(key);
+			auto e = _keyboard.hotkey().k2evt(k);
 			if (_setting_control.changing_hotkey()) {
 				_setting_control.change_hotkey(e, k);
 				cast_change(_setting_control.casted());
@@ -305,8 +305,8 @@ void StageSettings::main(Stage& s) {
 	
 			// main
 			if (e == Event::KEY_ESC) {
-				keyboard_.set_keyboard_running(false);
-				keyboard_.set_current_event(Event::NONE_EVENT);
+				_keyboard.set_keyboard_running(false);
+				_keyboard.set_current_event(Event::NONE_EVENT);
 				return;
 			}
 			else {
@@ -323,8 +323,8 @@ void StageSettings::main(Stage& s) {
 
 
 void StageSettings::load_basic_assets() {
-	keyboard_.set_keyboard_running(true);
-	running_.store(true);
+	_keyboard.set_keyboard_running(true);
+	_running.store(true);
 
 	_setting_control.reset_page();
 	clear_all(_setting_control.resolution());

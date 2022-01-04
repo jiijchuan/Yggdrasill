@@ -213,27 +213,32 @@ void Keyboard::set_hotkey(hotkey_ptr hotkey) {
 }
 
 void Keyboard::main() {
-	while (_keyboard_running) {
-		// TODO: complete rewrite
 #ifdef _WIN64
+	while (_keyboard_running) {
 		if (_kbhit()) {
 			auto key = _getch();
 			_current_key = get_key(key);
 			Keyboard::kbcv.notify_all();
 		}
-#endif
 	}
+#endif
+#ifdef __linux__
+	// TODO: complete rewrite
+#endif
 }
 
 inline key Keyboard::get_key(int k) {
 	// case each button
+#ifdef _WIN64
 	if (isascii(k)) return key(KeyType::ASCII, k);
 	else {
-		// TODO: complete rewrite
-#ifdef _WIN64
 		auto ch = _getch();
 		return key(KeyType::NONE_ASCII, ch);
-#endif
+
 	}
+#endif
+#ifdef __linux__
+	// TODO: complete rewrite
+#endif
 }
 

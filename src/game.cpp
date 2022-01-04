@@ -82,7 +82,7 @@ int SnakeControl::step() {
 
 	uint16_t new_x = 0, new_y = 0;
 	
-	switch (status_) {
+	switch (_status) {
 	case SnakeStatus::HEADING_DOWN:
 		new_x = head().x();
 		new_y = head().y() + 1;
@@ -110,14 +110,14 @@ int SnakeControl::step() {
 	head().y() = new_y;
 
 	//if not growing, move tail and pop last part of body
-	if (!growing_) {
+	if (!_growing) {
 		tail().x() = _components[_components.size() - 2].x();
 		tail().y() = _components[_components.size() - 2].y();
 		_components.erase(_components.end() - 2);
 	}
 
 	// whatever growing or not, set growing to false
-	growing_.store(false);
+	_growing.store(false);
 
 	return 1;
 }
@@ -125,10 +125,10 @@ int SnakeControl::step() {
 bool SnakeControl::heading_backhead() {
 	auto head_ = head();
 	auto backhead = _components[1];
-	if (backhead.x() == head_.x() && (backhead.y() == head_.y() + 1)) return status_ == SnakeStatus::HEADING_DOWN;
-	else if (backhead.x() == head_.x() && (backhead.y() == head_.y() - 1)) return status_ == SnakeStatus::HEADING_UP;
-	else if ((backhead.x() == head_.x() + 1) && backhead.y() == head_.y()) return status_ == SnakeStatus::HEADING_RIGHT;
-	else if ((backhead.x() == head_.x() - 1) && backhead.y() == head_.y()) return status_ == SnakeStatus::HEADING_LEFT;
+	if (backhead.x() == head_.x() && (backhead.y() == head_.y() + 1)) return _status == SnakeStatus::HEADING_DOWN;
+	else if (backhead.x() == head_.x() && (backhead.y() == head_.y() - 1)) return _status == SnakeStatus::HEADING_UP;
+	else if ((backhead.x() == head_.x() + 1) && backhead.y() == head_.y()) return _status == SnakeStatus::HEADING_RIGHT;
+	else if ((backhead.x() == head_.x() - 1) && backhead.y() == head_.y()) return _status == SnakeStatus::HEADING_LEFT;
 #ifdef _WIN64
 	else throw std::exception("incorrect head-body direction!");
 #else
@@ -137,18 +137,18 @@ bool SnakeControl::heading_backhead() {
 }
 
 void SnakeControl::dir_reverse() {
-	switch (status_) {
+	switch (_status) {
 	case SnakeStatus::HEADING_DOWN:
-		status_ = SnakeStatus::HEADING_UP;
+		_status = SnakeStatus::HEADING_UP;
 		break;
 	case SnakeStatus::HEADING_UP:
-		status_ = SnakeStatus::HEADING_DOWN;
+		_status = SnakeStatus::HEADING_DOWN;
 		break;
 	case SnakeStatus::HEADING_LEFT:
-		status_ = SnakeStatus::HEADING_RIGHT;
+		_status = SnakeStatus::HEADING_RIGHT;
 		break;
 	case SnakeStatus::HEADING_RIGHT:
-		status_ = SnakeStatus::HEADING_LEFT;
+		_status = SnakeStatus::HEADING_LEFT;
 		break;
 	default:
 		break;
@@ -164,7 +164,7 @@ bool SnakeControl::touches(component& c) {
 	auto y_short = head.y() - c.y();
 	auto x_short = head.x() - c.x();
 
-	switch (status_) {
+	switch (_status) {
 	case SnakeStatus::HEADING_UP:
 		if (y_short < 1 || x_short < 0 || y_short - 1 >= c_h || x_short >= c_w) return false;
 		return c.mat()[(size_t)y_short - (size_t)1][x_short] != SPACE;

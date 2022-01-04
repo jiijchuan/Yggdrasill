@@ -8,15 +8,15 @@
 class Interface {
 public:
 	Interface(HotKeys hotkey) : 
-		flush_list_({}),
-		running_(true),
-		keyboard_(hotkey)
+		_flush_list({}),
+		_running(true),
+		_keyboard(hotkey)
 	{};
 
 	Interface() :
-		flush_list_({}),
-		running_(true),
-		keyboard_()
+		_flush_list({}),
+		_running(true),
+		_keyboard()
 	{};
 
 	void clear_all(uint16_t res);
@@ -26,18 +26,17 @@ protected:
 	void flush(); 
 	void cover_ch(char ch, uint16_t x, uint16_t y);
 
-	// cast a waited change to flush list
+	// cast waiting changes to flush list
 	void cast_change(component c);
 	void cast_change(std::vector<component> c);
 	void clear_area(component& c);
 	void clear_area(snake_vec vec);
-	//void clear_all(uint16_t res);
 
 protected:
 	HotKeys _hotkey;
-	Keyboard keyboard_;
-	std::vector<component> flush_list_;
-	std::atomic<bool> running_;
+	Keyboard _keyboard;
+	std::vector<component> _flush_list;
+	std::atomic<bool> _running;
 };
 
 class StageMenu : public Interface {
@@ -66,7 +65,7 @@ public:
 
 	void main(Stage& s);
 	void set_global(Global& global) { _global = global; }
-	void set_hotkey(hotkey_ptr hkp) { keyboard_.set_hotkey(hkp); }
+	void set_hotkey(hotkey_ptr hkp) { _keyboard.set_hotkey(hkp); }
 	bool rookie() { return _rookie.load(); };
 	void set_rookie(bool r) { _rookie.store(r); };
 

@@ -53,8 +53,8 @@ public:
 	SnakeControl(int res)
 		: 
 		BaseControl(res),
-		status_(SnakeStatus::HEADING_RIGHT),
-		growing_(false)
+		_status(SnakeStatus::HEADING_RIGHT),
+		_growing(false)
 	{
 		init();
 	};
@@ -65,13 +65,13 @@ public:
 	component& tail() { return _components[_components.size() - 1]; };
 	snake_vec body() { return snake_vec(_components.begin() + 1, _components.end() - 1); };
 	
-	void set_status(SnakeStatus s) { status_ = s; };
-	SnakeStatus status() { return status_.load(); };
+	void set_status(SnakeStatus s) { _status = s; };
+	SnakeStatus status() { return _status.load(); };
 
 	// erase tail before step
 	int step();
 
-	void grow() { growing_.store(true); };
+	void grow() { _growing.store(true); };
 	bool touches(component& c);
 	bool touches(snake_vec c);
 
@@ -80,8 +80,8 @@ private:
 	bool heading_backhead();
 
 private:
-	std::atomic<SnakeStatus> status_;
-	std::atomic<bool> growing_;
+	std::atomic<SnakeStatus> _status;
+	std::atomic<bool> _growing;
 };
 
 class GameMapControl:public BaseControl {
@@ -112,7 +112,7 @@ public:
 		MenuControl(res),
 		_menu_start_height(res * 3 / 8),
 		_menu_left_align(res / 2 - 2),
-		restart_(false)
+		_restart(false)
 	{
 		init();
 	};
@@ -120,21 +120,21 @@ public:
 	void init() override;
 
 	// if it's first time enter menu or died and return
-	bool rookie() { return restart_.load(); };
+	bool rookie() { return _restart.load(); };
 
 	// first time load menu, or died and return to menu
-	void set_fresh_new() { restart_.store(true); };
+	void set_fresh_new() { _restart.store(true); };
 
 	void arrow_up() { arrow_to_front(); };
 	void arrow_down() { arrow_to_end(); };
 
 	// back from pause window
-	void set_damn_old() { restart_.store(false); };
+	void set_damn_old() { _restart.store(false); };
 	snake_vec options() { return snake_vec(_components.begin() + 1, _components.end()); };
 	Stage to_stage();
 
 private:
-	std::atomic<bool> restart_;
+	std::atomic<bool> _restart;
 
 private:
 	uint16_t _menu_start_height;
